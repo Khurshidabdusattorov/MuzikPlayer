@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">MuzikPlayer</string>
+    <string name="music_artist_photo">Music artist photo</string>
+    <string name="next_music">next music</string>
+    <string name="music_pause">music pause</string>
+    <string name="prew_music">prew_music</string>
+    <string name="music_stop">music stop</string>
+    <string name="version_1_0">version : 1.0</string>
+    <string name="music_logo">music logo</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
