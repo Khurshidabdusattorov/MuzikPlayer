@@ -15,22 +15,18 @@ import com.bumptech.glide.Glide
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import uz.gita.muzikplayer.AppManager
 import uz.gita.muzikplayer.R
-import uz.gita.muzikplayer.checkPermissions
 import uz.gita.muzikplayer.data.model.MusicData
 import uz.gita.muzikplayer.data.model.enumdata.ActionEnum
 import uz.gita.muzikplayer.databinding.ScreenMainBinding
 import uz.gita.muzikplayer.getAlbumImageAsync
-import uz.gita.muzikplayer.getMusicCursor
 import uz.gita.muzikplayer.presentation.service.MusicService
-import uz.gita.muzikplayer.presentation.ui.screen.splash.SplashScreenDirections
+import uz.gita.muzikplayer.utils.AppManager
 
 /**
  * Creator : Xurshid Abdusattorov
@@ -38,21 +34,28 @@ import uz.gita.muzikplayer.presentation.ui.screen.splash.SplashScreenDirections
  * Project : MuzikPlayer
  * Package : uz.gita.muzikplayer.presentation.ui.screen.main
  */
-class MainScreen:Fragment(R.layout.screen_main) {
+class MainScreen : Fragment(R.layout.screen_main) {
+    private val myLifecycleScope = CoroutineScope(Dispatchers.Main + Job())
+
+
     private val binding: ScreenMainBinding by viewBinding(ScreenMainBinding::bind)
     private val adapter = MusicAdapter()
     private val bitmapScope = CoroutineScope(Dispatchers.IO + Job())
-    private val job: Job? = null
+    private var job: Job? = null
     private var lastTime: Long = -1
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
         adapter.cursor = AppManager.cursor
 
         adapter.setSelectMusicListener {
-            if (System.currentTimeMillis() - lastTime >= 600) {
-                lastTime = System.currentTimeMillis()
-                AppManager.selectMusicPos = it
-                startMusicService(ActionEnum.PLAY)
+            job?.cancel()
+            job = lifecycleScope.launch {
+                if (System.currentTimeMillis() - lastTime >= 600) {
+                    lastTime = System.currentTimeMillis()
+                    AppManager.selectMusicPos = it
+                    startMusicService(ActionEnum.PLAY)
+                }
+                delay(600)
             }
         }
 

@@ -1,4 +1,4 @@
-package uz.gita.muzikplayer
+package uz.gita.muzikplayer.utils
 
 import android.app.Activity
 import android.content.Context

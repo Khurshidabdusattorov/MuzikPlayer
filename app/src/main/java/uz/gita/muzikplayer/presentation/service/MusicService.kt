@@ -10,6 +10,7 @@ import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Build
 import android.os.IBinder
+import android.util.Log
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import kotlinx.coroutines.CoroutineScope
@@ -20,12 +21,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
-import uz.gita.muzikplayer.AppManager
+import uz.gita.muzikplayer.utils.AppManager
 import uz.gita.muzikplayer.R
 import uz.gita.muzikplayer.data.model.MusicData
 import uz.gita.muzikplayer.data.model.enumdata.ActionEnum
 import uz.gita.muzikplayer.data.source.localdata.LocalData
-import uz.gita.muzikplayer.getMusicDataByPosition
+import uz.gita.muzikplayer.utils.getMusicDataByPosition
 import java.io.File
 
 /**
@@ -52,6 +53,7 @@ class MusicService : Service() {
         createChannel()
         startMusicService()
     }
+
     private fun createChannel() {
         if (Build.VERSION.SDK_INT >= 26) {
             val channel = NotificationChannel(
@@ -113,6 +115,7 @@ class MusicService : Service() {
         doneCommand(command)
         return START_NOT_STICKY
     }
+
     private fun doneCommand(command: ActionEnum) {
         val data: MusicData = AppManager.cursor?.getMusicDataByPosition(AppManager.selectMusicPos)!!
         LocalData.musicPos = AppManager.selectMusicPos
@@ -122,6 +125,7 @@ class MusicService : Service() {
                 if (mediaPlayer.isPlaying) doneCommand(ActionEnum.PAUSE)
                 else doneCommand(ActionEnum.PLAY)
             }
+
             ActionEnum.PLAY -> {
 
                 if (mediaPlayer.isPlaying) mediaPlayer.stop()
@@ -130,7 +134,7 @@ class MusicService : Service() {
                 mediaPlayer.setOnCompletionListener { doneCommand(ActionEnum.NEXT) }
                 AppManager.fullTime = data.duration
                 mediaPlayer.seekTo(AppManager.currentTime.toInt())
-                job?.let { it.cancel() }
+                job?.cancel()
                 job = scope.launch {
                     changeProgress().collectLatest {
                         AppManager.currentTime = it
@@ -143,12 +147,14 @@ class MusicService : Service() {
 
                 startMusicService()
             }
+
             ActionEnum.PAUSE -> {
                 mediaPlayer.stop()
                 job?.cancel()
                 AppManager.isPlayingLiveData.value = false
                 startMusicService()
             }
+
             ActionEnum.PREV -> {
                 AppManager.currentTime = 0
                 if (AppManager.selectMusicPos == 0) AppManager.selectMusicPos =
@@ -156,6 +162,7 @@ class MusicService : Service() {
                 else AppManager.selectMusicPos--
                 doneCommand(ActionEnum.PLAY)
             }
+
             ActionEnum.NEXT -> {
                 AppManager.currentTime = 0
                 if (AppManager.selectMusicPos + 1 == AppManager.cursor!!.count) AppManager.selectMusicPos =
@@ -163,10 +170,12 @@ class MusicService : Service() {
                 else AppManager.selectMusicPos++
                 doneCommand(ActionEnum.PLAY)
             }
+
             ActionEnum.CANCEL -> {
                 mediaPlayer.stop()
                 stopSelf()
             }
+
             ActionEnum.SEEK -> {
                 mediaPlayer.seekTo(AppManager.progress)
                 AppManager.currentTime = AppManager.progress.toLong()
@@ -181,6 +190,7 @@ class MusicService : Service() {
             }
         }
     }
+
     private fun changeProgress(): Flow<Long> = flow {
         for (i in AppManager.currentTime until AppManager.fullTime step 490) {
             delay(490)

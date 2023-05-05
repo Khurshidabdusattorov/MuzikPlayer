@@ -1,4 +1,4 @@
-package uz.gita.muzikplayer
+package uz.gita.muzikplayer.utils
 
 import android.content.Context
 import android.database.Cursor

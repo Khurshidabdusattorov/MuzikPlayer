@@ -3,7 +3,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/color1">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/color1"
+    tools:context=".presentation.ui.screen.splash.SplashScreen">
 
     <ImageView
         android:layout_width="0dp"

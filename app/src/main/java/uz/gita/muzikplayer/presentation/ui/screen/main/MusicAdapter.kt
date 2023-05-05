@@ -16,7 +16,7 @@ import kotlinx.coroutines.withContext
 import uz.gita.muzikplayer.R
 import uz.gita.muzikplayer.databinding.ItemMusicBinding
 import uz.gita.muzikplayer.getAlbumImageAsync
-import uz.gita.muzikplayer.getMusicDataByPosition
+import uz.gita.muzikplayer.utils.getMusicDataByPosition
 
 /**
  * Creator : Xurshid Abdusattorov
